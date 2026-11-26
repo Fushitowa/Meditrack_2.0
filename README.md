@@ -89,4 +89,13 @@ committed `frontend/.env.example` is a template; `.env` files are ignored by Git
 - Frontend and backend module boundaries are separate so their implementations can evolve independently.
 - Shared frontend components, layouts, navigation, configuration, and utilities have dedicated locations.
 - Database assets are kept outside the backend source tree so schema evolution remains explicit.
-- The frontend provides an admin dashboard preview at `/admin` (also the default `/`) and a separate doctor portal preview at `/doctor`. These demo routes are not protected by authentication; the pages use sample data until Supabase and role-based access are connected. Other modules remain scaffolding for future work.
+- The frontend provides read-only demo pages using sample data:
+
+- Admin: `/admin`, `/admin/patients`, `/admin/doctors`, `/admin/appointments`,
+  `/admin/records`, and `/admin/access`.
+- Doctor: `/doctor`, `/doctor/appointments`, `/doctor/patients`, and
+  `/doctor/records`.
+
+The list pages support local search and status filtering. These routes are not
+protected by authentication and must not be used for real patient data until
+Supabase integration and server-enforced role authorization are implemented.

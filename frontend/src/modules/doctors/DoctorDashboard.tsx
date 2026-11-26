@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import "./DoctorDashboard.css";
+import { appointments as previewAppointments, patients as previewPatients } from "../../data/previewData";
 
 type IconName = "overview" | "calendar" | "patients" | "records" | "search" | "arrow" | "clock";
 
@@ -30,12 +32,18 @@ function Icon({ name }: { name: IconName }) {
   );
 }
 
-const appointments = [
-  { time: "09:30 AM", patient: "Amelia Morgan", age: "34 yrs", reason: "Annual check-up", status: "Checked in", initials: "AM", color: "lavender" },
-  { time: "10:00 AM", patient: "James Wilson", age: "52 yrs", reason: "Follow-up visit", status: "In consultation", initials: "JW", color: "peach" },
-  { time: "10:30 AM", patient: "Sophia Patel", age: "27 yrs", reason: "General consultation", status: "Upcoming", initials: "SP", color: "mint" },
-  { time: "11:15 AM", patient: "Liam Brooks", age: "46 yrs", reason: "Blood pressure review", status: "Upcoming", initials: "LB", color: "blue" },
-];
+const appointments = previewAppointments
+  .filter((appointment) => appointment.doctor === "Dr. Ethan Cole")
+  .map((appointment) => ({
+    time: appointment.displayTime,
+    patient: appointment.name,
+    patientId: appointment.patientId,
+    age: `${appointment.age} yrs`,
+    reason: appointment.reason,
+    status: appointment.status,
+    initials: appointment.initials,
+    color: appointment.color,
+  }));
 
 const followUps = [
   { initials: "ER", name: "Emma Richardson", detail: "Review lab results", due: "Today", color: "blue" },
@@ -44,15 +52,16 @@ const followUps = [
 ];
 
 const navigation = [
-  { label: "Overview", href: "#doctor-overview", icon: "overview" as const },
-  { label: "Appointments", href: "#doctor-appointments", icon: "calendar" as const },
-  { label: "My patients", href: "#doctor-patients", icon: "patients" as const },
-  { label: "Clinical notes", href: "#doctor-notes", icon: "records" as const },
+  { label: "Overview", to: "/doctor", icon: "overview" as const },
+  { label: "Appointments", to: "/doctor/appointments", icon: "calendar" as const },
+  { label: "My patients", to: "/doctor/patients", icon: "patients" as const },
+  { label: "Clinical records", to: "/doctor/records", icon: "records" as const },
 ];
 
 function DoctorDashboard() {
   const [patientSearch, setPatientSearch] = useState("");
-  const [activeSection, setActiveSection] = useState("Overview");
+  const { pathname } = useLocation();
+  const activeSection = navigation.find((item) => item.to === pathname)?.label ?? "Overview";
   const today = new Intl.DateTimeFormat("en", {
     weekday: "long",
     month: "long",
@@ -65,15 +74,20 @@ function DoctorDashboard() {
     day: "numeric",
   }).format(new Date()).toUpperCase();
   const visibleAppointments = appointments.filter((appointment) =>
-    `${appointment.patient} ${appointment.reason}`
+    `${appointment.patient} ${appointment.reason} ${appointment.patientId ?? ""}`
       .toLowerCase()
       .includes(patientSearch.toLowerCase()),
   );
+  const visiblePatients = previewPatients
+    .filter((patient) => patient.doctor === "Dr. Ethan Cole")
+    .filter((patient) => `${patient.name} ${patient.id} ${patient.condition}`
+      .toLowerCase()
+      .includes(patientSearch.toLowerCase()));
 
   return (
     <div className="doctor-dashboard">
       <aside className="doctor-sidebar">
-        <a className="doctor-brand" href="/doctor" aria-label="MediTrack doctor portal">
+        <Link className="doctor-brand" to="/doctor" aria-label="MediTrack doctor portal">
           <span className="doctor-brand-mark" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none">
               <rect width="40" height="40" rx="13" fill="currentColor" />
@@ -83,7 +97,7 @@ function DoctorDashboard() {
           </span>
           <span>MediTrack</span>
           <span className="doctor-brand-label">DOCTOR</span>
-        </a>
+        </Link>
 
         <div className="doctor-workspace-card">
           <span className="doctor-clinic-mark">NC</span>
@@ -93,27 +107,26 @@ function DoctorDashboard() {
         <nav className="doctor-nav" aria-label="Doctor portal">
           <span className="doctor-nav-label">MY WORKSPACE</span>
           {navigation.map((item) => (
-            <a
-              aria-current={activeSection === item.label ? "page" : undefined}
+            <NavLink
               aria-label={item.label}
-              className={`doctor-nav-link${activeSection === item.label ? " active" : ""}`}
-              href={item.href}
-              key={item.label}
-              onClick={() => setActiveSection(item.label)}
+              className={({ isActive }) => `doctor-nav-link${isActive ? " active" : ""}`}
+              end
+              key={item.to}
+              to={item.to}
               title={item.label}
             >
               <Icon name={item.icon} />
               <span>{item.label}</span>
-            </a>
+            </NavLink>
           ))}
         </nav>
 
         <div className="doctor-sidebar-bottom">
-          <a aria-label="Switch to admin portal" className="admin-portal-link" href="/admin" title="Switch to admin portal">
+          <Link aria-label="Switch to admin portal" className="admin-portal-link" to="/admin" title="Switch to admin portal">
             <Icon name="overview" />
             <span><strong>Admin portal</strong><small>Switch workspace</small></span>
             <Icon name="arrow" />
-          </a>
+          </Link>
           <div className="doctor-user">
             <span className="doctor-avatar doctor-avatar-teal">EC</span>
             <span className="doctor-user-copy"><strong>Dr. Ethan Cole</strong><small>Cardiology</small></span>
@@ -188,7 +201,7 @@ function DoctorDashboard() {
                   <p className="doctor-empty-state">No appointments match “{patientSearch}”.</p>
                 )}
               </div>
-              <a className="doctor-list-footer" href="#doctor-appointments"><Icon name="clock" /> 4 more appointments today <Icon name="arrow" /></a>
+              <a className="doctor-list-footer" href="#doctor-appointments"><Icon name="clock" /> 5 more appointments today <Icon name="arrow" /></a>
             </section>
 
             <section className="doctor-panel follow-up-panel" id="doctor-notes">
@@ -223,14 +236,14 @@ function DoctorDashboard() {
               </label>
             </div>
             <div className="doctor-patient-strip">
-              {visibleAppointments.slice(0, 3).map((appointment) => (
-                <article className="doctor-patient-card" key={appointment.patient}>
-                  <span className={`doctor-avatar doctor-avatar-${appointment.color}`}>{appointment.initials}</span>
-                  <span><strong>{appointment.patient}</strong><small>{appointment.reason}</small></span>
-                  <a href="#doctor-appointments" aria-label={`View ${appointment.patient}'s appointment`}><Icon name="arrow" /></a>
+              {visiblePatients.slice(0, 3).map((patient) => (
+                <article className="doctor-patient-card" key={patient.id}>
+                  <span className={`doctor-avatar doctor-avatar-${patient.color}`}>{patient.initials}</span>
+                  <span><strong>{patient.name}</strong><small>{patient.condition}</small></span>
+                  <Link to="/doctor/appointments" aria-label={`View ${patient.name}'s appointment`}><Icon name="arrow" /></Link>
                 </article>
               ))}
-              {visibleAppointments.length === 0 && (
+              {visiblePatients.length === 0 && (
                 <p className="doctor-empty-state">No patients match “{patientSearch}”.</p>
               )}
             </div>

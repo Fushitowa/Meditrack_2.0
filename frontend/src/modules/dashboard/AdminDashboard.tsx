@@ -1,4 +1,11 @@
 import { useState, type ReactNode } from "react";
+import { Link, NavLink } from "react-router-dom";
+import {
+  appointments,
+  doctors,
+  patients,
+  recentActivity as activity,
+} from "../../data/previewData";
 import "./AdminDashboard.css";
 
 type IconName =
@@ -45,31 +52,6 @@ function Icon({ name }: { name: IconName }) {
   );
 }
 
-const patients = [
-  { initials: "AM", name: "Amelia Morgan", id: "PT-2048", date: "Today, 9:42 AM", doctor: "Dr. Ethan Cole", status: "Checked in", color: "lavender" },
-  { initials: "JW", name: "James Wilson", id: "PT-2047", date: "Today, 9:18 AM", doctor: "Dr. Olivia Bennett", status: "In consultation", color: "peach" },
-  { initials: "SP", name: "Sophia Patel", id: "PT-2046", date: "Today, 8:56 AM", doctor: "Dr. Ethan Cole", status: "Scheduled", color: "mint" },
-  { initials: "LB", name: "Liam Brooks", id: "PT-2045", date: "Yesterday, 4:30 PM", doctor: "Dr. Noah Williams", status: "Completed", color: "blue" },
-];
-
-const appointments = [
-  { time: "09:30", name: "Amelia Morgan", reason: "Annual check-up", doctor: "Dr. Ethan Cole", initials: "AM", color: "lavender", status: "Checked in" },
-  { time: "10:00", name: "James Wilson", reason: "Follow-up visit", doctor: "Dr. Olivia Bennett", initials: "JW", color: "peach", status: "In consultation" },
-  { time: "10:30", name: "Sophia Patel", reason: "General consultation", doctor: "Dr. Ethan Cole", initials: "SP", color: "mint", status: "Upcoming" },
-];
-
-const doctors = [
-  { initials: "EC", name: "Ethan Cole", specialty: "Cardiology", color: "blue", availability: "Available" },
-  { initials: "OB", name: "Olivia Bennett", specialty: "Pediatrics", color: "peach", availability: "With patient" },
-  { initials: "NW", name: "Noah Williams", specialty: "Family medicine", color: "mint", availability: "Available" },
-];
-
-const activity = [
-  { title: "Clinical note added", detail: "Dr. Ethan Cole · Amelia Morgan", time: "12 min ago", color: "mint" },
-  { title: "Patient record updated", detail: "Dr. Olivia Bennett · James Wilson", time: "38 min ago", color: "lavender" },
-  { title: "Prescription renewed", detail: "Dr. Noah Williams · Liam Brooks", time: "1 hour ago", color: "peach" },
-];
-
 const weeklyVisits = [
   { day: "Mon", value: 54 },
   { day: "Tue", value: 73 },
@@ -86,7 +68,6 @@ function initialsClass(color: string) {
 
 function AdminDashboard() {
   const [patientSearch, setPatientSearch] = useState("");
-  const [activeSection, setActiveSection] = useState("overview");
   const visiblePatients = patients.filter((patient) =>
     `${patient.name} ${patient.id} ${patient.doctor}`
       .toLowerCase()
@@ -105,17 +86,18 @@ function AdminDashboard() {
   }).format(new Date()).toUpperCase();
 
   const navigation = [
-    { label: "Overview", href: "#overview", icon: "overview" as const, id: "overview" },
-    { label: "Patients", href: "#patients", icon: "patients" as const, id: "patients" },
-    { label: "Doctors", href: "#doctors", icon: "doctors" as const, id: "doctors" },
-    { label: "Appointments", href: "#appointments", icon: "appointments" as const, id: "appointments" },
-    { label: "Clinical records", href: "#activity", icon: "records" as const, id: "activity" },
+    { label: "Overview", to: "/admin", icon: "overview" as const },
+    { label: "Patients", to: "/admin/patients", icon: "patients" as const },
+    { label: "Doctors", to: "/admin/doctors", icon: "doctors" as const },
+    { label: "Appointments", to: "/admin/appointments", icon: "appointments" as const },
+    { label: "Clinical records", to: "/admin/records", icon: "records" as const },
+    { label: "Roles & permissions", to: "/admin/access", icon: "records" as const },
   ];
 
   return (
     <div className="admin-dashboard">
       <aside className="dashboard-sidebar">
-        <a className="dashboard-brand" href="#overview" aria-label="MediTrack dashboard">
+        <Link className="dashboard-brand" to="/admin" aria-label="MediTrack dashboard">
           <span className="dashboard-brand-mark" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none">
               <rect width="40" height="40" rx="13" fill="currentColor" />
@@ -125,7 +107,7 @@ function AdminDashboard() {
           </span>
           <span>MediTrack</span>
           <span className="brand-admin-label">ADMIN</span>
-        </a>
+        </Link>
 
         <div className="sidebar-clinic">
           <span className="clinic-avatar">NC</span>
@@ -136,28 +118,27 @@ function AdminDashboard() {
           <span className="clinic-switch" aria-hidden="true">⌄</span>
         </div>
 
-        <a aria-label="Open doctor portal" className="portal-switch-link" href="/doctor" title="Open doctor portal">
+        <Link aria-label="Open doctor portal" className="portal-switch-link" to="/doctor" title="Open doctor portal">
           <Icon name="doctors" />
           <span>Open doctor portal</span>
           <Icon name="arrow" />
-        </a>
+        </Link>
 
         <nav className="dashboard-nav" aria-label="Admin portal">
           <span className="nav-section-label">WORKSPACE</span>
           {navigation.map((item) => (
-            <a
-              aria-current={activeSection === item.id ? "page" : undefined}
+            <NavLink
               aria-label={item.label}
-              className={`dashboard-nav-link${activeSection === item.id ? " active" : ""}`}
-              href={item.href}
-              key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              className={({ isActive }) => `dashboard-nav-link${isActive ? " active" : ""}`}
+              end
+              key={item.to}
+              to={item.to}
               title={item.label}
             >
               <Icon name={item.icon} />
               <span>{item.label}</span>
-              {item.id === "appointments" && <span className="nav-count">8</span>}
-            </a>
+              {item.to === "/admin/appointments" && <span className="nav-count">8</span>}
+            </NavLink>
           ))}
         </nav>
 
@@ -248,7 +229,7 @@ function AdminDashboard() {
                 <div><h2>Patient visits</h2><p>Clinic activity throughout the week</p></div>
                 <button className="select-button" type="button">This week <span>⌄</span></button>
               </div>
-              <div className="visits-summary"><strong>186</strong><span>visits this week</span><span className="summary-change">↑ 14.8%</span></div>
+              <div className="visits-summary">              <strong>415</strong><span>visits this week</span><span className="summary-change">↑ 14.8%</span></div>
               <div className="chart-area" role="img" aria-label="Patient visits by day: Monday 54, Tuesday 73, Wednesday 62, Thursday 88, Friday 68, Saturday 42, Sunday 28">
                 <div className="chart-y-labels" aria-hidden="true"><span>100</span><span>75</span><span>50</span><span>25</span></div>
                 <div className="chart-plot">
@@ -285,7 +266,7 @@ function AdminDashboard() {
                   </article>
                 ))}
               </div>
-              <a className="appointments-footer-link" href="#appointments"><Icon name="clock" /> 5 more appointments today <Icon name="arrow" /></a>
+              <a className="appointments-footer-link" href="#appointments"><Icon name="clock" /> 19 more appointments today <Icon name="arrow" /></a>
             </section>
           </div>
 
