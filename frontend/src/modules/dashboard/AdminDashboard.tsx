@@ -136,6 +136,12 @@ function AdminDashboard() {
           <span className="clinic-switch" aria-hidden="true">⌄</span>
         </div>
 
+        <a aria-label="Open doctor portal" className="portal-switch-link" href="/doctor" title="Open doctor portal">
+          <Icon name="doctors" />
+          <span>Open doctor portal</span>
+          <Icon name="arrow" />
+        </a>
+
         <nav className="dashboard-nav" aria-label="Admin portal">
           <span className="nav-section-label">WORKSPACE</span>
           {navigation.map((item) => (

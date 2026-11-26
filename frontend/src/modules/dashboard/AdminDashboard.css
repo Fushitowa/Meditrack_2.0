@@ -122,6 +122,36 @@
   font-size: 17px;
 }
 
+.portal-switch-link {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  margin: 9px 2px 0;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: #558477;
+  font-size: 9px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.portal-switch-link:hover {
+  color: #276f61;
+  background: #f0f7f3;
+}
+
+.portal-switch-link .dashboard-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.portal-switch-link .dashboard-icon:last-child {
+  width: 13px;
+  height: 13px;
+  margin-left: auto;
+}
+
 .dashboard-nav {
   display: flex;
   flex-direction: column;
@@ -1334,6 +1364,8 @@
 
   .dashboard-brand > span:not(.dashboard-brand-mark),
   .sidebar-clinic,
+  .portal-switch-link > span,
+  .portal-switch-link .dashboard-icon:last-child,
   .nav-section-label,
   .dashboard-nav-link > span,
   .sidebar-help,
@@ -1346,6 +1378,14 @@
     width: 100%;
     align-items: center;
     margin-top: 32px;
+  }
+
+  .portal-switch-link {
+    width: 44px;
+    height: 40px;
+    justify-content: center;
+    margin: 8px 0 0;
+    padding: 0;
   }
 
   .dashboard-nav-link {
