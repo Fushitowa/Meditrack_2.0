@@ -1,6 +1,16 @@
 # MediTrack
 
-MediTrack is organized as a framework-neutral monorepo foundation for a clinical management system. This repository currently contains structure only; application behavior, dependencies, and technology choices are intentionally deferred.
+MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite. Its current screen is a responsive sign-in page; authentication is not yet connected to a backend or Supabase.
+
+## Run the frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Create a production build with `npm run build` from the `frontend` directory.
 
 ## Project layout
 
@@ -49,4 +59,4 @@ database/
 - Frontend and backend module boundaries are separate so their implementations can evolve independently.
 - Shared frontend components, layouts, navigation, configuration, and utilities have dedicated locations.
 - Database assets are kept outside the backend source tree so schema evolution remains explicit.
-- No framework, runtime, package manifest, schema, sample data, or feature implementation is prescribed at this stage.
+- The frontend entry point renders the authentication module; other modules remain scaffolding for future work.
