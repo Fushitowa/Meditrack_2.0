@@ -1,6 +1,6 @@
 # MediTrack
 
-MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite. Its current screen is a responsive sign-in page; authentication is not yet connected to a backend or Supabase.
+MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite. It currently opens to an admin dashboard preview with sample data; authentication and dashboard data are not yet connected to Supabase.
 
 ## Run the frontend
 
@@ -50,13 +50,43 @@ backend/
     services/                    Cross-module backend services
     utils/                       Backend utilities and helpers
 database/
-  migrations/                    Future schema migration files
+  migrations/                    Supabase SQL migrations
   schema/                        Future database schema definitions
 ```
+
+## Supabase database
+
+The initial schema is in `database/migrations/20261126220000_initial_schema.sql`.
+It creates staff profiles (linked to Supabase Auth), doctors, patients, and
+clinical records. Row-level security lets admins manage all records and doctors
+access only patients assigned to them. New Auth users receive a `staff` profile
+by default; roles must be assigned by an administrator.
+
+To set it up:
+
+1. Create a Supabase project at [supabase.com](https://supabase.com).
+2. In the project dashboard, open **SQL Editor**, paste the contents of the
+   migration file, and run it.
+3. Create your first user under **Authentication → Users**.
+4. In the SQL Editor, promote that account to admin, replacing the email:
+
+   ```sql
+   update public.profiles
+   set role = 'admin'
+   where email = 'admin@yourclinic.com';
+   ```
+
+The frontend sign-in screen is not yet connected to Supabase. Do not expose a
+Supabase service-role key in the frontend; client access must use the publishable
+key and rely on the database row-level security policies.
+
+The frontend environment file is `frontend/.env`. Fill in `VITE_SUPABASE_URL`
+and `VITE_SUPABASE_ANON_KEY` from your Supabase project's API settings. The
+committed `frontend/.env.example` is a template; `.env` files are ignored by Git.
 
 ## Organization notes
 
 - Frontend and backend module boundaries are separate so their implementations can evolve independently.
 - Shared frontend components, layouts, navigation, configuration, and utilities have dedicated locations.
 - Database assets are kept outside the backend source tree so schema evolution remains explicit.
-- The frontend entry point renders the authentication module; other modules remain scaffolding for future work.
+- The frontend entry point renders the dashboard preview; authentication and other modules remain scaffolding for future work.

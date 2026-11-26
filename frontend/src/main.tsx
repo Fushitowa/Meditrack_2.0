@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import LoginPage from "./modules/authentication/LoginPage";
+import AdminDashboard from "./modules/dashboard/AdminDashboard";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <LoginPage />
+    <AdminDashboard />
   </StrictMode>,
 );
