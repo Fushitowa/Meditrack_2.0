@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { SignOutButton } from "../../auth/AuthRoutes";
+import { useAuth } from "../../auth/AuthProvider";
 import "./DoctorDashboard.css";
 import { appointments as previewAppointments, patients as previewPatients } from "../../data/previewData";
 
@@ -54,6 +56,10 @@ const navigation = [
 function DoctorDashboard() {
   const [patientSearch, setPatientSearch] = useState("");
   const { pathname } = useLocation();
+  const { profile } = useAuth();
+  const doctorName = profile?.fullName || "Doctor";
+  const doctorSpecialty = profile?.specialty || "Clinician";
+  const doctorInitials = doctorName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   const activeSection = navigation.find((item) => item.to === pathname)?.label ?? "Overview";
   const today = new Intl.DateTimeFormat("en", {
     weekday: "long",
@@ -114,14 +120,14 @@ function DoctorDashboard() {
         </nav>
 
         <div className="doctor-sidebar-bottom">
-          <Link aria-label="Switch to admin portal" className="admin-portal-link" to="/admin" title="Switch to admin portal">
+          <div aria-label="Admin access is restricted" className="admin-portal-link" title="Admin access is restricted">
             <Icon name="overview" />
-            <span><strong>Admin portal</strong><small>Switch workspace</small></span>
-            <Icon name="arrow" />
-          </Link>
+            <span><strong>Admin access</strong><small>Administrators only</small></span>
+          </div>
           <div className="doctor-user">
-            <span className="doctor-avatar doctor-avatar-teal">DR</span>
-            <span className="doctor-user-copy"><strong>Doctor</strong><small>Clinician</small></span>
+            <span className="doctor-avatar doctor-avatar-teal">{doctorInitials}</span>
+            <span className="doctor-user-copy"><strong>{doctorName}</strong><small>{doctorSpecialty}</small></span>
+            <SignOutButton className="doctor-user-more" />
             <span className="doctor-user-more" aria-hidden="true">···</span>
           </div>
         </div>
@@ -136,7 +142,7 @@ function DoctorDashboard() {
               <input aria-label="Search patients and appointments" placeholder="Search patients..." />
             </label>
             <span className="doctor-topbar-date"><Icon name="calendar" /> {today}</span>
-            <span className="doctor-avatar doctor-avatar-teal topbar-doctor-avatar" aria-label="Doctor">DR</span>
+            <span className="doctor-avatar doctor-avatar-teal topbar-doctor-avatar" aria-label={doctorName}>{doctorInitials}</span>
           </div>
         </header>
 
@@ -144,7 +150,7 @@ function DoctorDashboard() {
           <section className="doctor-heading" id="doctor-overview">
             <div>
               <span className="doctor-eyebrow">{todayHeading}</span>
-              <h1>Good morning, Doctor</h1>
+              <h1>Good morning, {doctorName}</h1>
               <p>Here’s your care schedule and patient follow-ups for today.</p>
             </div>
             <span className="doctor-shift">Doctor preview</span>

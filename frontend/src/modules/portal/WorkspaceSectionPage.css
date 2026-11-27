@@ -221,11 +221,27 @@
   font-weight: 700;
 }
 
-.workspace-user > span:last-child {
+.workspace-user > span:nth-child(2) {
   display: flex;
   min-width: 0;
   flex-direction: column;
   gap: 3px;
+}
+
+.workspace-sign-out {
+  padding: 5px 0 5px 3px;
+  border: 0;
+  color: #75827f;
+  background: transparent;
+  cursor: pointer;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.workspace-sign-out:hover {
+  color: #2a7667;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .workspace-user strong {
@@ -403,6 +419,143 @@
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 2px 6px rgb(35 61 51 / 2%);
+}
+
+.doctor-management {
+  display: grid;
+  gap: 15px;
+}
+
+.doctor-account-panel {
+  padding: 18px;
+  border: 1px solid #e9eeec;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgb(35 61 51 / 2%);
+}
+
+.doctor-account-heading {
+  margin-bottom: 15px;
+}
+
+.doctor-account-heading h2 {
+  margin: 0 0 5px;
+  color: #354742;
+  font-family: "Manrope", sans-serif;
+  font-size: 13px;
+}
+
+.doctor-account-heading p {
+  max-width: 680px;
+  margin: 0;
+  color: #899591;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.doctor-account-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.doctor-account-form label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  color: #52615c;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.doctor-account-form input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e4ebe8;
+  border-radius: 6px;
+  color: #354742;
+  background: #fff;
+  font: inherit;
+}
+
+.doctor-account-form input:focus {
+  border-color: #69afa2;
+  outline: 3px solid rgb(67 157 142 / 11%);
+}
+
+.doctor-account-form .auth-form-error {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.doctor-account-submit {
+  width: fit-content;
+  min-height: 36px;
+  grid-column: 1 / -1;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background: #177f73;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.doctor-account-submit:hover {
+  background: #126c65;
+}
+
+.doctor-account-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.doctor-account-success {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid #cfe5d8;
+  border-radius: 7px;
+  color: #3e6e5c;
+  background: #f0f8f3;
+  font-size: 10px;
+}
+
+.doctor-account-success p {
+  margin: 5px 0 8px;
+  line-height: 1.5;
+}
+
+.doctor-account-success code {
+  display: inline-block;
+  padding: 5px 7px;
+  border: 1px solid #d5e7db;
+  border-radius: 4px;
+  color: #334940;
+  background: #fff;
+  font-size: 11px;
+  user-select: all;
+}
+
+.doctor-account-success button {
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 5px;
+  color: #3e6e5c;
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.doctor-account-success button:hover {
+  background: #e3f1e8;
 }
 
 .workspace-table-heading {
@@ -609,6 +762,11 @@
   background: #eef6f2;
 }
 
+.workspace-table-footer button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .workspace-page-footer {
   display: flex;
   justify-content: space-between;
@@ -668,7 +826,7 @@
   .workspace-nav-link > span,
   .workspace-switch > span,
   .workspace-switch .workspace-icon:last-child,
-  .workspace-user > span:last-child {
+  .workspace-user > span:nth-child(2) {
     display: none;
   }
 
@@ -700,6 +858,16 @@
   .workspace-user {
     justify-content: center;
     padding-top: 12px;
+  }
+
+  .workspace-sign-out {
+    padding-left: 0;
+    font-size: 0;
+  }
+
+  .workspace-sign-out::after {
+    content: "↪";
+    font-size: 14px;
   }
 }
 
@@ -779,6 +947,14 @@
   .workspace-table-footer {
     padding-right: 12px;
     padding-left: 12px;
+  }
+
+  .doctor-account-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .doctor-account-success {
+    flex-direction: column;
   }
 
   .workspace-page-footer {

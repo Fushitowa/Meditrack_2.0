@@ -1,5 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { SignOutButton } from "../../auth/AuthRoutes";
+import { useAuth } from "../../auth/AuthProvider";
 import {
   appointments,
   clinicalRecords,
@@ -10,6 +12,7 @@ import {
   type Doctor,
   type Patient,
 } from "../../data/previewData";
+import DoctorManagementPanel from "../admin/DoctorManagementPanel";
 import "./WorkspaceSectionPage.css";
 
 export type PortalRole = "admin" | "doctor";
@@ -227,6 +230,16 @@ function WorkspaceSectionPage({ role, section }: { role: PortalRole; section: Po
   const definition = useMemo(() => getDefinition(role, section), [role, section]);
   const navigation = getNavigation(role);
   const isAdmin = role === "admin";
+  const { profile } = useAuth();
+  const profileInitials = profile?.fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase() || (isAdmin ? "CA" : "DR");
+  const profileName = profile?.fullName || (isAdmin ? "Clinic Admin" : "Doctor");
+  const profileLabel = isAdmin ? "Administrator" : profile?.specialty || "Clinician";
   const rows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return definition.rows.filter((row) => {
@@ -293,18 +306,22 @@ function WorkspaceSectionPage({ role, section }: { role: PortalRole; section: Po
         </nav>
 
         <div className="workspace-sidebar-bottom">
-          <Link
-            aria-label={isAdmin ? "Open doctor portal" : "Switch to admin portal"}
-            className="workspace-switch"
-            to={isAdmin ? "/doctor" : "/admin"}
-          >
-            <WorkspaceIconView name={isAdmin ? "doctors" : "overview"} />
-            <span>{isAdmin ? "Open doctor portal" : "Switch to admin portal"}</span>
-            <WorkspaceIconView name="arrow" />
-          </Link>
+          {isAdmin ? (
+            <Link aria-label="Manage doctor accounts" className="workspace-switch" to="/admin/doctors">
+              <WorkspaceIconView name="doctors" />
+              <span>Manage doctor accounts</span>
+              <WorkspaceIconView name="arrow" />
+            </Link>
+          ) : (
+            <div aria-label="Admin access is restricted" className="workspace-switch">
+              <WorkspaceIconView name="overview" />
+              <span>Admin access · Admins only</span>
+            </div>
+          )}
           <div className="workspace-user">
-            <span className={`workspace-avatar ${isAdmin ? "avatar-teal" : "avatar-blue"}`}>{isAdmin ? "CA" : "EC"}</span>
-            <span><strong>{isAdmin ? "Clinic Admin" : "Doctor"}</strong><small>{isAdmin ? "Administrator" : "Clinician"}</small></span>
+            <span className={`workspace-avatar ${isAdmin ? "avatar-teal" : "avatar-blue"}`}>{profileInitials}</span>
+            <span><strong>{profileName}</strong><small>{profileLabel}</small></span>
+            <SignOutButton className="workspace-sign-out" />
           </div>
         </div>
       </aside>
@@ -326,83 +343,89 @@ function WorkspaceSectionPage({ role, section }: { role: PortalRole; section: Po
             </div>
           </header>
 
-          <div className="workspace-preview-banner">
-            <span />
-            Preview data
-            <small>This view is read-only and uses sample data until Supabase is connected.</small>
-          </div>
-
-          <section className="workspace-summary" aria-label={`${definition.title} summary`}>
-            <article><span>Records in preview</span><strong>{definition.rows.length}</strong><small>Displayed in this demo</small></article>
-            <article><span>{statistic.label}</span><strong>{secondaryCount}</strong><small>Based on current sample statuses</small></article>
-            <article><span>Workspace</span><strong>{isAdmin ? "Admin" : "Doctor"}</strong><small>{isAdmin ? "Clinic-wide view" : "Assigned care view"}</small></article>
-          </section>
-
-          <section className="workspace-table-panel" aria-label={definition.title}>
-            <div className="workspace-table-heading">
-              <div><h2>{definition.title} directory</h2><p>{rows.length} of {definition.rows.length} sample records</p></div>
-              <div className="workspace-table-controls">
-                <label className="workspace-search">
-                  <WorkspaceIconView name="search" />
-                  <input
-                    aria-label={definition.searchLabel}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder={definition.searchLabel}
-                    value={query}
-                  />
-                </label>
-                <label className="workspace-filter-label">
-                  <span className="sr-only">Filter by status</span>
-                  <select
-                    aria-label="Filter by status"
-                    onChange={(event) => setStatusFilter(event.target.value)}
-                    value={statusFilter}
-                  >
-                    <option>All statuses</option>
-                    {statuses.map((status) => <option key={status}>{status}</option>)}
-                  </select>
-                </label>
+          {isAdmin && section === "doctors" ? (
+            <DoctorManagementPanel />
+          ) : (
+            <>
+              <div className="workspace-preview-banner">
+                <span />
+                Preview data
+                <small>This view is read-only and uses sample data until Supabase is connected.</small>
               </div>
-            </div>
 
-            <div className="workspace-table-scroll">
-              <table className="workspace-table">
-                <thead>
-                  <tr>
-                    <th>{section === "appointments" ? "Patient" : section === "records" ? "Patient / Record" : section === "access" ? "Role" : section === "doctors" ? "Doctor" : "Patient"}</th>
-                    {definition.columns.map((column) => <th key={column}>{column}</th>)}
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.id}>
-                      <td>
-                        <div className="workspace-primary-cell">
-                          <span className={initialsClass(row.color)}>{row.initials}</span>
-                          <span><strong>{row.primary}</strong><small>{row.secondary}</small></span>
-                        </div>
-                      </td>
-                      {row.cells.map((cell, index) => <td key={`${row.id}-${index}`}>{cell}</td>)}
-                      <td><span className={`workspace-status ${statusClass(row.status)}`}><i />{row.status}</span></td>
-                    </tr>
-                  ))}
-                  {rows.length === 0 && (
-                    <tr><td className="workspace-empty" colSpan={definition.columns.length + 2}>No records match the current search or status filter.</td></tr>
+              <section className="workspace-summary" aria-label={`${definition.title} summary`}>
+                <article><span>Records in preview</span><strong>{definition.rows.length}</strong><small>Displayed in this demo</small></article>
+                <article><span>{statistic.label}</span><strong>{secondaryCount}</strong><small>Based on current sample statuses</small></article>
+                <article><span>Workspace</span><strong>{isAdmin ? "Admin" : "Doctor"}</strong><small>{isAdmin ? "Clinic-wide view" : "Assigned care view"}</small></article>
+              </section>
+
+              <section className="workspace-table-panel" aria-label={definition.title}>
+                <div className="workspace-table-heading">
+                  <div><h2>{definition.title} directory</h2><p>{rows.length} of {definition.rows.length} sample records</p></div>
+                  <div className="workspace-table-controls">
+                    <label className="workspace-search">
+                      <WorkspaceIconView name="search" />
+                      <input
+                        aria-label={definition.searchLabel}
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder={definition.searchLabel}
+                        value={query}
+                      />
+                    </label>
+                    <label className="workspace-filter-label">
+                      <span className="sr-only">Filter by status</span>
+                      <select
+                        aria-label="Filter by status"
+                        onChange={(event) => setStatusFilter(event.target.value)}
+                        value={statusFilter}
+                      >
+                        <option>All statuses</option>
+                        {statuses.map((status) => <option key={status}>{status}</option>)}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="workspace-table-scroll">
+                  <table className="workspace-table">
+                    <thead>
+                      <tr>
+                        <th>{section === "appointments" ? "Patient" : section === "records" ? "Patient / Record" : section === "access" ? "Role" : section === "doctors" ? "Doctor" : "Patient"}</th>
+                        {definition.columns.map((column) => <th key={column}>{column}</th>)}
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row) => (
+                        <tr key={row.id}>
+                          <td>
+                            <div className="workspace-primary-cell">
+                              <span className={initialsClass(row.color)}>{row.initials}</span>
+                              <span><strong>{row.primary}</strong><small>{row.secondary}</small></span>
+                            </div>
+                          </td>
+                          {row.cells.map((cell, index) => <td key={`${row.id}-${index}`}>{cell}</td>)}
+                          <td><span className={`workspace-status ${statusClass(row.status)}`}><i />{row.status}</span></td>
+                        </tr>
+                      ))}
+                      {rows.length === 0 && (
+                        <tr><td className="workspace-empty" colSpan={definition.columns.length + 2}>No records match the current search or status filter.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <footer className="workspace-table-footer">
+                  <span>Showing {rows.length} sample {rows.length === 1 ? "record" : "records"}</span>
+                  {(query || statusFilter !== "All statuses") && (
+                    <button type="button" onClick={() => { setQuery(""); setStatusFilter("All statuses"); }}>Clear filters</button>
                   )}
-                </tbody>
-              </table>
-            </div>
+                </footer>
+              </section>
 
-            <footer className="workspace-table-footer">
-              <span>Showing {rows.length} sample {rows.length === 1 ? "record" : "records"}</span>
-              {(query || statusFilter !== "All statuses") && (
-                <button type="button" onClick={() => { setQuery(""); setStatusFilter("All statuses"); }}>Clear filters</button>
-              )}
-            </footer>
-          </section>
-
-          <footer className="workspace-page-footer"><span>© {new Date().getFullYear()} MediTrack</span><span>{roleTitle} · Preview only</span></footer>
+              <footer className="workspace-page-footer"><span>© {new Date().getFullYear()} MediTrack</span><span>{roleTitle} · Preview only</span></footer>
+            </>
+          )}
         </div>
       </main>
     </div>

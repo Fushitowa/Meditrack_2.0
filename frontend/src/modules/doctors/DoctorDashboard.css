@@ -185,6 +185,10 @@
   transition: background 140ms ease;
 }
 
+.admin-portal-link[aria-label="Admin access is restricted"] {
+  cursor: default;
+}
+
 .admin-portal-link:hover {
   background: #f2f7f4;
 }
@@ -285,8 +289,19 @@
 }
 
 .doctor-user-more {
+  padding: 4px 0 4px 4px;
+  border: 0;
   color: #8b9995;
-  font-size: 17px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.doctor-user-more:hover {
+  color: #2a7667;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .doctor-main {
@@ -897,8 +912,7 @@
   .doctor-nav-link > span,
   .admin-portal-link > span,
   .admin-portal-link > .doctor-icon:last-child,
-  .doctor-user-copy,
-  .doctor-user-more {
+  .doctor-user-copy {
     display: none;
   }
 
@@ -930,6 +944,16 @@
   .doctor-user {
     justify-content: center;
     padding-top: 12px;
+  }
+
+  .doctor-user-more {
+    padding: 4px 0 4px 3px;
+    font-size: 0;
+  }
+
+  .doctor-user-more::after {
+    content: "↪";
+    font-size: 14px;
   }
 
   .doctor-main-grid {

@@ -344,8 +344,20 @@
   height: 18px;
 }
 
-.profile-menu {
-  width: 25px;
+.profile-sign-out {
+  padding: 5px 0;
+  border: 0;
+  color: #75827f;
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.profile-sign-out:hover {
+  color: #2a7667;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .dashboard-main {
@@ -1370,8 +1382,14 @@
   .dashboard-nav-link > span,
   .sidebar-help,
   .profile-copy,
-  .profile-menu {
-    display: none;
+  .profile-sign-out {
+    padding-left: 0;
+    font-size: 0;
+  }
+
+  .profile-sign-out::after {
+    content: "↪";
+    font-size: 14px;
   }
 
   .dashboard-nav {

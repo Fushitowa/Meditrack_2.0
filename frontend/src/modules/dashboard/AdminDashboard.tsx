@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { SignOutButton } from "../../auth/AuthRoutes";
+import { useAuth } from "../../auth/AuthProvider";
 import {
   appointments,
   doctors,
@@ -66,6 +68,7 @@ function initialsClass(color: string) {
 
 function AdminDashboard() {
   const [patientSearch, setPatientSearch] = useState("");
+  const { profile } = useAuth();
   const visiblePatients = patients.filter((patient) =>
     `${patient.name} ${patient.id} ${patient.doctor}`
       .toLowerCase()
@@ -116,9 +119,9 @@ function AdminDashboard() {
           <span className="clinic-switch" aria-hidden="true">⌄</span>
         </div>
 
-        <Link aria-label="Open doctor portal" className="portal-switch-link" to="/doctor" title="Open doctor portal">
+        <Link aria-label="Manage doctor accounts" className="portal-switch-link" to="/admin/doctors" title="Manage doctor accounts">
           <Icon name="doctors" />
-          <span>Open doctor portal</span>
+          <span>Manage doctor accounts</span>
           <Icon name="arrow" />
         </Link>
 
@@ -148,10 +151,8 @@ function AdminDashboard() {
           </div>
           <div className="sidebar-profile">
             <span className="person-avatar avatar-teal">CA</span>
-            <span className="profile-copy"><strong>Clinic Admin</strong><small>Administrator</small></span>
-            <button className="icon-button profile-menu" type="button" aria-label="Profile options">
-              <Icon name="more" />
-            </button>
+            <span className="profile-copy"><strong>{profile?.fullName || "Clinic Admin"}</strong><small>Administrator</small></span>
+            <SignOutButton className="profile-sign-out" />
           </div>
         </div>
       </aside>
@@ -191,7 +192,7 @@ function AdminDashboard() {
           <div className="preview-notice">
             <span className="preview-pulse" />
             Preview dashboard
-            <span>Sample data only — connect Supabase to see live clinic information.</span>
+            <span>Doctor accounts are live; patient and appointment data are not connected yet.</span>
           </div>
 
           <section className="metrics-grid" aria-label="Clinic summary">
@@ -303,7 +304,7 @@ function AdminDashboard() {
 
           <div className="dashboard-secondary-grid">
             <section className="panel doctors-panel" id="doctors">
-              <div className="panel-heading"><div><h2>Doctors on duty</h2><p>Availability across your care team</p></div><a className="panel-link" href="#doctors">View team <Icon name="arrow" /></a></div>
+              <div className="panel-heading"><div><h2>Doctors on duty</h2><p>Availability across your care team</p></div><Link className="panel-link" to="/admin/doctors">View team <Icon name="arrow" /></Link></div>
               <div className="doctor-list">
                 {doctors.map((doctor) => (
                   <article className="doctor-item" key={doctor.initials}>
@@ -314,7 +315,7 @@ function AdminDashboard() {
                 ))}
                 {doctors.length === 0 && <p className="empty-search">No doctors yet.</p>}
               </div>
-              <a className="doctors-footer-link" href="#doctors"><Icon name="plus" /> Add a doctor</a>
+              <Link className="doctors-footer-link" to="/admin/doctors"><Icon name="plus" /> Add a doctor</Link>
             </section>
 
             <section className="panel activity-panel" id="activity">

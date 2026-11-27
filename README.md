@@ -1,6 +1,6 @@
 # MediTrack
 
-MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite. It currently opens to an admin dashboard preview; patient, doctor, appointment, clinical-record, and activity data are empty until planned. Authentication and dashboard data are not yet connected to Supabase.
+MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite and signs users in through Supabase Auth. Doctor accounts are managed through Supabase; patient, appointment, clinical-record, and activity data remain empty previews.
 
 ## Run the frontend
 
@@ -76,26 +76,45 @@ To set it up:
    where email = 'admin@yourclinic.com';
    ```
 
-The frontend sign-in screen is not yet connected to Supabase. Do not expose a
-Supabase service-role key in the frontend; client access must use the publishable
-key and rely on the database row-level security policies.
+The sign-in screen uses Supabase Auth. Do not expose a Supabase service-role key
+in the frontend; browser access uses the publishable key and relies on database
+row-level security policies.
 
 The frontend environment file is `frontend/.env`. Fill in `VITE_SUPABASE_URL`
 and `VITE_SUPABASE_ANON_KEY` from your Supabase project's API settings. The
 committed `frontend/.env.example` is a template; `.env` files are ignored by Git.
+
+To enable admin-managed doctor accounts, link this repository to your Supabase
+project with the Supabase CLI, replacing `your-project-ref` with the project
+reference from the Supabase dashboard, then deploy the protected Edge Functions:
+
+```powershell
+supabase login
+supabase link --project-ref your-project-ref
+supabase functions deploy create-doctor
+supabase functions deploy complete-password-change
+```
+
+The admin creates doctor accounts from **Admin → Doctors**. Name, specialty,
+and email are stored in `profiles` and `doctors`. The temporary password is
+handled only by Supabase Auth, shown once after creation, and required to be
+changed at the doctor's first sign-in. Passwords are never stored in or shown
+in the doctor directory. The Edge Functions use Supabase's server-side
+`SUPABASE_SERVICE_ROLE_KEY`; never add that key to `frontend/.env` or any
+`VITE_` variable.
 
 ## Organization notes
 
 - Frontend and backend module boundaries are separate so their implementations can evolve independently.
 - Shared frontend components, layouts, navigation, configuration, and utilities have dedicated locations.
 - Database assets are kept outside the backend source tree so schema evolution remains explicit.
-- The frontend provides read-only demo pages. Patient, doctor, appointment, clinical-record, and activity sections currently show empty states:
+- The frontend provides read-only demo pages for the empty patient, appointment, clinical-record, and activity sections. The admin doctor directory is connected to Supabase:
 
 - Admin: `/admin`, `/admin/patients`, `/admin/doctors`, `/admin/appointments`,
   `/admin/records`, and `/admin/access`.
 - Doctor: `/doctor`, `/doctor/appointments`, `/doctor/patients`, and
   `/doctor/records`.
 
-The list pages support local search and status filtering. These routes are not
-protected by authentication and must not be used for real patient data until
-Supabase integration and server-enforced role authorization are implemented.
+The admin and doctor workspaces require an authenticated account with the
+matching role. Patient, appointment, clinical-record, and activity pages still
+show empty preview data and are not connected to live clinic data.

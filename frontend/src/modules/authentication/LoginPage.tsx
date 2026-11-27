@@ -1,4 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { roleHome } from "../../auth/AuthRoutes";
+import { useAuth } from "../../auth/AuthProvider";
 
 function BrandMark() {
   return (
@@ -43,10 +46,53 @@ function EyeIcon({ visible }: { visible: boolean }) {
 
 function LoginPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const { signIn, signOut, session, profile, loading, error: authError } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && session && profile) {
+      navigate(
+        session.user.app_metadata.must_change_password === true
+          ? "/change-password"
+          : roleHome(profile.role),
+        { replace: true },
+      );
+    }
+  }, [loading, navigate, profile, session]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormError(null);
+    setSubmitting(true);
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    void signIn(email, password).then(async ({ user, profile: signedInProfile }) => {
+      if (signedInProfile.role === "staff") {
+        await signOut();
+        throw new Error("This account does not have access to a MediTrack workspace.");
+      }
+      navigate(
+        user.app_metadata.must_change_password === true
+          ? "/change-password"
+          : roleHome(signedInProfile.role),
+        { replace: true },
+      );
+    }).catch((error: unknown) => {
+      setFormError(error instanceof Error ? error.message : "Unable to sign in.");
+    }).finally(() => {
+      setSubmitting(false);
+    });
   }
+
+  if (!loading && session && !profile && !authError) {
+    return <Navigate to="/" replace />;
+  }
+
+  const visibleError = formError ?? authError;
 
   return (
     <main className="login-page">
@@ -134,6 +180,7 @@ function LoginPage() {
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
+            {visibleError && <p className="auth-form-error" role="alert">{visibleError}</p>}
             <label className="field-label" htmlFor="email">
               Work email
             </label>
@@ -227,8 +274,8 @@ function LoginPage() {
               <span>Keep me signed in</span>
             </label>
 
-            <button className="sign-in-button" type="submit">
-              <span>Sign in</span>
+            <button className="sign-in-button" disabled={submitting} type="submit">
+              <span>{submitting ? "Signing in…" : "Sign in"}</span>
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path
                   d="M4 10h12m-5-5 5 5-5 5"

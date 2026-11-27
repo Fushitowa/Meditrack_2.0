@@ -1,0 +1,7 @@
+project_id = "meditrack-2-0"
+
+[functions.create-doctor]
+verify_jwt = true
+
+[functions.complete-password-change]
+verify_jwt = true
