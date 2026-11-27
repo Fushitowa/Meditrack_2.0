@@ -49,11 +49,7 @@ export interface ClinicalRecord {
 
 export const patients: Patient[] = [];
 
-export const doctors: Doctor[] = [
-  { initials: "EC", name: "Ethan Cole", specialty: "Cardiology", color: "blue", availability: "Available", email: "ethan.cole@example.test", phone: "(555) 010-1001", patientCount: 0 },
-  { initials: "OB", name: "Olivia Bennett", specialty: "Pediatrics", color: "peach", availability: "With patient", email: "olivia.bennett@example.test", phone: "(555) 010-1002", patientCount: 0 },
-  { initials: "NW", name: "Noah Williams", specialty: "Family medicine", color: "mint", availability: "Available", email: "noah.williams@example.test", phone: "(555) 010-1003", patientCount: 0 },
-];
+export const doctors: Doctor[] = [];
 
 export const appointments: Appointment[] = [];
 

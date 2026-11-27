@@ -207,9 +207,8 @@ function AdminDashboard() {
             </article>
             <article className="metric-card">
               <div className="metric-topline"><span>Active doctors</span><span className="metric-icon metric-blue"><Icon name="doctors" /></span></div>
-              <div className="metric-value-row"><strong>18</strong><span className="metric-change neutral">of 22 total</span></div>
-              <span className="metric-footnote">4 doctors currently unavailable</span>
-              <div className="metric-sparkline spark-blue" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
+              <div className="metric-value-row"><strong>0</strong></div>
+              <span className="metric-footnote">No doctors added</span>
             </article>
             <article className="metric-card">
               <div className="metric-topline"><span>Pending reviews</span><span className="metric-icon metric-amber"><Icon name="records" /></span></div>
@@ -313,6 +312,7 @@ function AdminDashboard() {
                     <span className={`doctor-availability${doctor.availability === "Available" ? " doctor-available" : ""}`}><i />{doctor.availability}</span>
                   </article>
                 ))}
+                {doctors.length === 0 && <p className="empty-search">No doctors yet.</p>}
               </div>
               <a className="doctors-footer-link" href="#doctors"><Icon name="plus" /> Add a doctor</a>
             </section>

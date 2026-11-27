@@ -147,9 +147,7 @@ function getRecordRows(source: ClinicalRecord[]): PageRow[] {
 
 function getDefinition(role: PortalRole, section: PortalSection): PageDefinition {
   if (section === "patients") {
-    const source = role === "doctor"
-      ? patients.filter((patient) => patient.doctor === "Dr. Ethan Cole")
-      : patients;
+    const source = role === "doctor" ? [] : patients;
     return {
       title: role === "doctor" ? "My patients" : "Patients",
       description: role === "doctor"
@@ -172,9 +170,7 @@ function getDefinition(role: PortalRole, section: PortalSection): PageDefinition
   }
 
   if (section === "appointments") {
-    const source = role === "doctor"
-      ? appointments.filter((appointment) => appointment.doctor === "Dr. Ethan Cole")
-      : appointments;
+    const source = role === "doctor" ? [] : appointments;
     return {
       title: role === "doctor" ? "My appointments" : "Appointments",
       description: role === "doctor"
@@ -187,9 +183,7 @@ function getDefinition(role: PortalRole, section: PortalSection): PageDefinition
   }
 
   if (section === "records") {
-    const source = role === "doctor"
-      ? clinicalRecords.filter((record) => record.doctor === "Dr. Ethan Cole")
-      : clinicalRecords;
+    const source = role === "doctor" ? [] : clinicalRecords;
     return {
       title: role === "doctor" ? "My clinical records" : "Clinical records",
       description: role === "doctor"
@@ -208,7 +202,7 @@ function getDefinition(role: PortalRole, section: PortalSection): PageDefinition
     columns: ["Users", "Patient access", "Clinical records", "Administration"],
     rows: [
       { id: "admin", initials: "AD", color: "lavender", primary: "Administrator", secondary: "Full clinic management", cells: ["1 demo user", "All clinic patients", "All clinic records", "Manage team and access"], status: "Configured" },
-      { id: "doctor", initials: "DR", color: "mint", primary: "Doctor", secondary: "Clinical care team", cells: ["3 demo users", "Assigned patients", "Assigned patient records", "No access"], status: "Configured" },
+      { id: "doctor", initials: "DR", color: "mint", primary: "Doctor", secondary: "Clinical care team", cells: ["0 users", "Assigned patients", "Assigned patient records", "No access"], status: "Configured" },
       { id: "staff", initials: "ST", color: "blue", primary: "Staff", secondary: "Clinic operations", cells: ["0 demo users", "No access", "No access", "No access"], status: "Restricted" },
     ],
   };
@@ -310,7 +304,7 @@ function WorkspaceSectionPage({ role, section }: { role: PortalRole; section: Po
           </Link>
           <div className="workspace-user">
             <span className={`workspace-avatar ${isAdmin ? "avatar-teal" : "avatar-blue"}`}>{isAdmin ? "CA" : "EC"}</span>
-            <span><strong>{isAdmin ? "Clinic Admin" : "Dr. Ethan Cole"}</strong><small>{isAdmin ? "Administrator" : "Cardiology"}</small></span>
+            <span><strong>{isAdmin ? "Clinic Admin" : "Doctor"}</strong><small>{isAdmin ? "Administrator" : "Clinician"}</small></span>
           </div>
         </div>
       </aside>

@@ -31,9 +31,7 @@ function Icon({ name }: { name: IconName }) {
   );
 }
 
-const appointments = previewAppointments
-  .filter((appointment) => appointment.doctor === "Dr. Ethan Cole")
-  .map((appointment) => ({
+const appointments = previewAppointments.map((appointment) => ({
     time: appointment.displayTime,
     patient: appointment.name,
     patientId: appointment.patientId,
@@ -74,7 +72,6 @@ function DoctorDashboard() {
       .includes(patientSearch.toLowerCase()),
   );
   const visiblePatients = previewPatients
-    .filter((patient) => patient.doctor === "Dr. Ethan Cole")
     .filter((patient) => `${patient.name} ${patient.id} ${patient.condition}`
       .toLowerCase()
       .includes(patientSearch.toLowerCase()));
@@ -123,8 +120,8 @@ function DoctorDashboard() {
             <Icon name="arrow" />
           </Link>
           <div className="doctor-user">
-            <span className="doctor-avatar doctor-avatar-teal">EC</span>
-            <span className="doctor-user-copy"><strong>Dr. Ethan Cole</strong><small>Cardiology</small></span>
+            <span className="doctor-avatar doctor-avatar-teal">DR</span>
+            <span className="doctor-user-copy"><strong>Doctor</strong><small>Clinician</small></span>
             <span className="doctor-user-more" aria-hidden="true">···</span>
           </div>
         </div>
@@ -139,7 +136,7 @@ function DoctorDashboard() {
               <input aria-label="Search patients and appointments" placeholder="Search patients..." />
             </label>
             <span className="doctor-topbar-date"><Icon name="calendar" /> {today}</span>
-            <span className="doctor-avatar doctor-avatar-teal topbar-doctor-avatar" aria-label="Dr. Ethan Cole">EC</span>
+            <span className="doctor-avatar doctor-avatar-teal topbar-doctor-avatar" aria-label="Doctor">DR</span>
           </div>
         </header>
 
@@ -147,10 +144,10 @@ function DoctorDashboard() {
           <section className="doctor-heading" id="doctor-overview">
             <div>
               <span className="doctor-eyebrow">{todayHeading}</span>
-              <h1>Good morning, Dr. Cole</h1>
+              <h1>Good morning, Doctor</h1>
               <p>Here’s your care schedule and patient follow-ups for today.</p>
             </div>
-            <span className="doctor-shift"><i /> On duty today</span>
+            <span className="doctor-shift">Doctor preview</span>
           </section>
 
           <div className="doctor-preview-note">
@@ -201,7 +198,7 @@ function DoctorDashboard() {
             <section className="doctor-panel follow-up-panel" id="doctor-notes">
               <div className="doctor-panel-heading">
                 <div><h2>Follow-ups &amp; notes</h2><p>Items that need your attention</p></div>
-                <span className="doctor-follow-up-count">3</span>
+                <span className="doctor-follow-up-count">{followUps.length}</span>
               </div>
               <div className="doctor-follow-up-list">
                 {followUps.map((item) => (
