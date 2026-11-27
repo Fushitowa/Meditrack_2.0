@@ -1,6 +1,6 @@
 # MediTrack
 
-MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite. It currently opens to an admin dashboard preview with sample data; authentication and dashboard data are not yet connected to Supabase.
+MediTrack is a clinic management system. The frontend is built with React and TypeScript using Vite. It currently opens to an admin dashboard preview; patient, appointment, clinical-record, and activity data are empty until planned. Authentication and dashboard data are not yet connected to Supabase.
 
 ## Run the frontend
 
@@ -89,7 +89,7 @@ committed `frontend/.env.example` is a template; `.env` files are ignored by Git
 - Frontend and backend module boundaries are separate so their implementations can evolve independently.
 - Shared frontend components, layouts, navigation, configuration, and utilities have dedicated locations.
 - Database assets are kept outside the backend source tree so schema evolution remains explicit.
-- The frontend provides read-only demo pages using sample data:
+- The frontend provides read-only demo pages. Patient, appointment, clinical-record, and activity sections currently show empty states:
 
 - Admin: `/admin`, `/admin/patients`, `/admin/doctors`, `/admin/appointments`,
   `/admin/records`, and `/admin/access`.

@@ -17,7 +17,6 @@ type IconName =
   | "search"
   | "arrow"
   | "calendar"
-  | "clock"
   | "plus"
   | "more";
 
@@ -31,7 +30,6 @@ function Icon({ name }: { name: IconName }) {
     search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
     calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>,
-    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
     plus: <><path d="M12 5v14M5 12h14" /></>,
     more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
   };
@@ -53,13 +51,13 @@ function Icon({ name }: { name: IconName }) {
 }
 
 const weeklyVisits = [
-  { day: "Mon", value: 54 },
-  { day: "Tue", value: 73 },
-  { day: "Wed", value: 62 },
-  { day: "Thu", value: 88 },
-  { day: "Fri", value: 68 },
-  { day: "Sat", value: 42 },
-  { day: "Sun", value: 28 },
+  { day: "Mon", value: 0 },
+  { day: "Tue", value: 0 },
+  { day: "Wed", value: 0 },
+  { day: "Thu", value: 0 },
+  { day: "Fri", value: 0 },
+  { day: "Sat", value: 0 },
+  { day: "Sun", value: 0 },
 ];
 
 function initialsClass(color: string) {
@@ -199,15 +197,13 @@ function AdminDashboard() {
           <section className="metrics-grid" aria-label="Clinic summary">
             <article className="metric-card">
               <div className="metric-topline"><span>Appointments today</span><span className="metric-icon metric-teal"><Icon name="appointments" /></span></div>
-              <div className="metric-value-row"><strong>24</strong><span className="metric-change positive">↗ 12.5%</span></div>
-              <span className="metric-footnote">Compared to yesterday</span>
-              <div className="metric-sparkline spark-teal" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
+              <div className="metric-value-row"><strong>0</strong></div>
+              <span className="metric-footnote">No appointments added</span>
             </article>
             <article className="metric-card">
               <div className="metric-topline"><span>Total patients</span><span className="metric-icon metric-lilac"><Icon name="patients" /></span></div>
-              <div className="metric-value-row"><strong>1,284</strong><span className="metric-change positive">↗ 8.2%</span></div>
-              <span className="metric-footnote">Added over the last 30 days</span>
-              <div className="metric-sparkline spark-lilac" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
+              <div className="metric-value-row"><strong>0</strong></div>
+              <span className="metric-footnote">No patients added</span>
             </article>
             <article className="metric-card">
               <div className="metric-topline"><span>Active doctors</span><span className="metric-icon metric-blue"><Icon name="doctors" /></span></div>
@@ -217,8 +213,8 @@ function AdminDashboard() {
             </article>
             <article className="metric-card">
               <div className="metric-topline"><span>Pending reviews</span><span className="metric-icon metric-amber"><Icon name="records" /></span></div>
-              <div className="metric-value-row"><strong>07</strong><span className="metric-change attention">Needs attention</span></div>
-              <span className="metric-footnote">Clinical notes awaiting review</span>
+              <div className="metric-value-row"><strong>0</strong></div>
+              <span className="metric-footnote">No pending reviews</span>
               <div className="metric-sparkline spark-amber" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
             </article>
           </section>
@@ -229,16 +225,14 @@ function AdminDashboard() {
                 <div><h2>Patient visits</h2><p>Clinic activity throughout the week</p></div>
                 <button className="select-button" type="button">This week <span>⌄</span></button>
               </div>
-              <div className="visits-summary">              <strong>415</strong><span>visits this week</span><span className="summary-change">↑ 14.8%</span></div>
-              <div className="chart-area" role="img" aria-label="Patient visits by day: Monday 54, Tuesday 73, Wednesday 62, Thursday 88, Friday 68, Saturday 42, Sunday 28">
+              <div className="visits-summary"><strong>0</strong><span>visits this week</span></div>
+              <div className="chart-area" role="img" aria-label="No patient visits this week">
                 <div className="chart-y-labels" aria-hidden="true"><span>100</span><span>75</span><span>50</span><span>25</span></div>
                 <div className="chart-plot">
                   <div className="chart-grid-lines" aria-hidden="true"><i /><i /><i /><i /></div>
                   {weeklyVisits.map((visit) => (
                     <div className="chart-column" key={visit.day}>
-                      <div className={`chart-bar${visit.day === "Thu" ? " chart-bar-highlight" : ""}`} style={{ height: `${visit.value}%` }}>
-                        {visit.day === "Thu" && <span className="chart-tooltip">88 visits</span>}
-                      </div>
+                      <div className="chart-bar" style={{ height: `${visit.value}%` }} />
                       <span className={visit.day === "Thu" ? "chart-day selected" : "chart-day"}>{visit.day}</span>
                     </div>
                   ))}
@@ -265,8 +259,8 @@ function AdminDashboard() {
                     <span className={`appointment-status status-${appointment.status.toLowerCase().replaceAll(" ", "-")}`}>{appointment.status}</span>
                   </article>
                 ))}
+                {appointments.length === 0 && <p className="empty-search">No appointments yet.</p>}
               </div>
-              <a className="appointments-footer-link" href="#appointments"><Icon name="clock" /> 19 more appointments today <Icon name="arrow" /></a>
             </section>
           </div>
 
@@ -301,7 +295,7 @@ function AdminDashboard() {
                     </tr>
                   ))}
                   {visiblePatients.length === 0 && (
-                    <tr><td className="empty-search" colSpan={6}>No patients match “{patientSearch}”.</td></tr>
+                    <tr><td className="empty-search" colSpan={6}>{patientSearch ? `No patients match “${patientSearch}”.` : "No patients yet."}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -333,6 +327,7 @@ function AdminDashboard() {
                     <time>{item.time}</time>
                   </article>
                 ))}
+                {activity.length === 0 && <p className="empty-search">No recent activity.</p>}
               </div>
               <a className="activity-footer-link" href="#activity">View activity log <Icon name="arrow" /></a>
             </section>

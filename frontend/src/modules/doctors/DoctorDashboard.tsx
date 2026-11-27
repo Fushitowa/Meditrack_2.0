@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import "./DoctorDashboard.css";
 import { appointments as previewAppointments, patients as previewPatients } from "../../data/previewData";
 
-type IconName = "overview" | "calendar" | "patients" | "records" | "search" | "arrow" | "clock";
+type IconName = "overview" | "calendar" | "patients" | "records" | "search" | "arrow";
 
 function Icon({ name }: { name: IconName }) {
   const paths: Record<IconName, ReactNode> = {
@@ -13,7 +13,6 @@ function Icon({ name }: { name: IconName }) {
     records: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M8 13h8M8 17h8" /></>,
     search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
-    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
   };
 
   return (
@@ -45,11 +44,7 @@ const appointments = previewAppointments
     color: appointment.color,
   }));
 
-const followUps = [
-  { initials: "ER", name: "Emma Richardson", detail: "Review lab results", due: "Today", color: "blue" },
-  { initials: "MT", name: "Mason Taylor", detail: "Update treatment plan", due: "Today", color: "peach" },
-  { initials: "AC", name: "Ava Chen", detail: "Sign consultation note", due: "Tomorrow", color: "lavender" },
-];
+const followUps: { initials: string; name: string; detail: string; due: string; color: string }[] = [];
 
 const navigation = [
   { label: "Overview", to: "/doctor", icon: "overview" as const },
@@ -74,7 +69,7 @@ function DoctorDashboard() {
     day: "numeric",
   }).format(new Date()).toUpperCase();
   const visibleAppointments = appointments.filter((appointment) =>
-    `${appointment.patient} ${appointment.reason} ${appointment.patientId ?? ""}`
+    `${appointment.patient} ${appointment.reason} ${appointment.patientId}`
       .toLowerCase()
       .includes(patientSearch.toLowerCase()),
   );
@@ -167,22 +162,22 @@ function DoctorDashboard() {
           <section className="doctor-stat-grid" aria-label="Your clinic summary">
             <article className="doctor-stat-card">
               <span>Appointments today</span><span className="doctor-stat-icon stat-green"><Icon name="calendar" /></span>
-              <strong>8</strong><small>3 completed · 5 remaining</small>
+              <strong>0</strong><small>No appointments scheduled</small>
             </article>
             <article className="doctor-stat-card">
               <span>My patients</span><span className="doctor-stat-icon stat-purple"><Icon name="patients" /></span>
-              <strong>142</strong><small>Patients in your care</small>
+              <strong>0</strong><small>No patients assigned</small>
             </article>
             <article className="doctor-stat-card">
               <span>Notes to complete</span><span className="doctor-stat-icon stat-amber"><Icon name="records" /></span>
-              <strong>3</strong><small>Clinical notes need your review</small>
+              <strong>0</strong><small>No notes to review</small>
             </article>
           </section>
 
           <div className="doctor-main-grid">
             <section className="doctor-panel doctor-appointments" id="doctor-appointments">
               <div className="doctor-panel-heading">
-                <div><h2>Today’s appointments</h2><p>{today} · 8 scheduled</p></div>
+                <div><h2>Today’s appointments</h2><p>{today}</p></div>
                 <a href="#doctor-appointments" className="doctor-text-link">Full schedule <Icon name="arrow" /></a>
               </div>
               <div className="doctor-appointment-list">
@@ -198,10 +193,9 @@ function DoctorDashboard() {
                   </article>
                 ))}
                 {visibleAppointments.length === 0 && (
-                  <p className="doctor-empty-state">No appointments match “{patientSearch}”.</p>
+                  <p className="doctor-empty-state">{patientSearch ? `No appointments match “${patientSearch}”.` : "No appointments yet."}</p>
                 )}
               </div>
-              <a className="doctor-list-footer" href="#doctor-appointments"><Icon name="clock" /> 5 more appointments today <Icon name="arrow" /></a>
             </section>
 
             <section className="doctor-panel follow-up-panel" id="doctor-notes">
@@ -217,6 +211,7 @@ function DoctorDashboard() {
                     <time>{item.due}</time>
                   </article>
                 ))}
+                {followUps.length === 0 && <p className="doctor-empty-state">No follow-ups yet.</p>}
               </div>
               <a className="doctor-list-footer" href="#doctor-notes">Review clinical notes <Icon name="arrow" /></a>
             </section>
@@ -244,7 +239,7 @@ function DoctorDashboard() {
                 </article>
               ))}
               {visiblePatients.length === 0 && (
-                <p className="doctor-empty-state">No patients match “{patientSearch}”.</p>
+                <p className="doctor-empty-state">{patientSearch ? `No patients match “${patientSearch}”.` : "No patients yet."}</p>
               )}
             </div>
           </section>
