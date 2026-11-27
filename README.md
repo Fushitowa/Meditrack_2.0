@@ -56,17 +56,20 @@ database/
 
 ## Supabase database
 
-The initial schema is in `database/migrations/20261126220000_initial_schema.sql`.
-It creates staff profiles (linked to Supabase Auth), doctors, patients, and
-clinical records. Row-level security lets admins manage all records and doctors
-access only patients assigned to them. New Auth users receive a `staff` profile
-by default; roles must be assigned by an administrator.
+The schema is managed through ordered SQL migrations in `database/migrations/`.
+The initial migration creates staff profiles (linked to Supabase Auth), doctors,
+patients, and clinical records. A follow-up migration adds input integrity
+constraints, documents the core tables, and preserves saved names when Auth
+metadata updates omit them. Row-level security lets admins manage all records
+and doctors access only patients assigned to them. New Auth users receive a
+`staff` profile by default; roles must be assigned by an administrator.
 
 To set it up:
 
 1. Create a Supabase project at [supabase.com](https://supabase.com).
-2. In the project dashboard, open **SQL Editor**, paste the contents of the
-   migration file, and run it.
+2. In the project dashboard, open **SQL Editor** and run the SQL files in
+   `database/migrations/` in timestamp order. Do not rerun migrations that have
+   already been applied.
 3. Create your first user under **Authentication → Users**.
 4. In the SQL Editor, promote that account to admin, replacing the email:
 

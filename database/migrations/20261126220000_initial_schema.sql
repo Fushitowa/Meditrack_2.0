@@ -1,3 +1,7 @@
+-- MediTrack initial schema.
+-- Apply once to a new Supabase project before applying later migrations.
+
+-- Identity and role data
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text not null unique,
@@ -16,6 +20,7 @@ create table public.doctors (
   updated_at timestamptz not null default now()
 );
 
+-- Clinical data
 create table public.patients (
   id uuid primary key default gen_random_uuid(),
   patient_number text not null unique,
@@ -46,11 +51,13 @@ create table public.clinical_records (
   updated_at timestamptz not null default now()
 );
 
+-- Foreign-key lookup indexes
 create index patients_assigned_doctor_id_idx on public.patients (assigned_doctor_id);
 create index clinical_records_patient_visit_idx
   on public.clinical_records (patient_id, visit_date desc);
 create index clinical_records_doctor_id_idx on public.clinical_records (doctor_id);
 
+-- Shared timestamp maintenance
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -78,6 +85,7 @@ create trigger clinical_records_set_updated_at
 before update on public.clinical_records
 for each row execute function public.set_updated_at();
 
+-- Keep application profiles synchronized with Supabase Auth
 create or replace function public.handle_auth_user()
 returns trigger
 language plpgsql
@@ -103,6 +111,7 @@ create trigger on_auth_user_created
 after insert or update of email, raw_user_meta_data on auth.users
 for each row execute function public.handle_auth_user();
 
+-- Authorization helpers used by row-level security policies
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -139,11 +148,13 @@ revoke all on function public.can_access_patient(uuid) from public;
 grant execute on function public.is_admin() to authenticated;
 grant execute on function public.can_access_patient(uuid) to authenticated;
 
+-- Row-level security
 alter table public.profiles enable row level security;
 alter table public.doctors enable row level security;
 alter table public.patients enable row level security;
 alter table public.clinical_records enable row level security;
 
+-- Profile and doctor policies
 create policy "Users can read their own profile"
 on public.profiles for select to authenticated
 using (id = (select auth.uid()) or (select public.is_admin()));
@@ -162,6 +173,7 @@ on public.doctors for all to authenticated
 using ((select public.is_admin()))
 with check ((select public.is_admin()));
 
+-- Patient policies
 create policy "Admins and assigned doctors can read patients"
 on public.patients for select to authenticated
 using ((select public.can_access_patient(id)));
@@ -185,6 +197,7 @@ create policy "Admins can delete patients"
 on public.patients for delete to authenticated
 using ((select public.is_admin()));
 
+-- Clinical-record policies
 create policy "Admins and assigned doctors can read clinical records"
 on public.clinical_records for select to authenticated
 using ((select public.can_access_patient(patient_id)));
